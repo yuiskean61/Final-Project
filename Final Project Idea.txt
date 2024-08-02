@@ -1,0 +1,54 @@
+CPAN 226 Network Programming - Final Project Idea
+
+Chat Application using Python:
+
+Client and Server side
+Server script that will wait for incoming messages from the clients
+Different users that needs to log in for authentication (separate but exactly same client scripts)
+Messages sent will be seen by all users who are logged in.
+
+For example:
+1 Server file/script
+3 users = 3 client scripts (exactly same) but user will need to log in proper credentials
+									- start with hard-coded credentials
+									- can work on using registration if possible
+									- SSL protocol maybe?
+Run it on the same computer first to see if it works.
+
+When the above work has been completed/verified that it works,
+then implement, if possible, that users can log in from another computer, while one user, or one computer will only
+be the Server script.
+
+
+
+
+
+
+Online Server and Client script:
+Server script IP address: 192.168.75.218
+Firewall Configuration:
+On the server computer, you may need to allow incoming connections on the port you're using (1024 in this case).
+On Windows:
+Open Windows Defender Firewall
+Click on "Advanced settings"
+Select "Inbound Rules" and create a new rule
+Choose "Port", then specify TCP and port 1024
+Allow the connection and apply to all network profiles
+
+
+Running the Scripts:
+On the server computer:
+	Open Spyder
+	Load the modified server script
+Run the server script
+	On the client computer(s):
+	Open Spyder
+	Load the modified client script
+	Run the client script
+
+
+Running the client script on VS code:
+	Open VS code
+	Go to the correct directory
+	open terminal
+	run "python client1.py" and so forth, make sure each client is running on its own terminal
