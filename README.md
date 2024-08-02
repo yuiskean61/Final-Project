@@ -13,42 +13,49 @@ Implementing Features Roles:
 
 **User Authentication and Database (RYAN): **
 
-    Start with implementing basic user authentication,
+    Start with implementing basic user authentication, like adding a registration if possible
 
-    MongoDB for database purposes; mainly where users data will be stored and chat history 
+    Make 3 users for each of us to use!
+
+    MongoDB for database purposes; mainly where users data will be stored and chat history
 
 
 
 **Private Messaging (TYLER): **
 
-    This builds on your existing messaging system 
+    Allow users to privately message user using a specific command,
 
-    It's a good stepping stone before implementing chatrooms 
+    Up to you how you would like to implement that,
 
-**Chatrooms (anyone of us) - not as important, do after PM is implemented: **
+    Either by creating a separate chatroom with the choses users or just using a direct message command
+
+    
+
+** Chatrooms (anyone of us) - not as important, do after PM is implemented: **
 
     Implement after private messaging is working well 
 
-    This feature significantly expands the app's capabilities 
 
  ** Enhance Current Functionality (EINON):** 
 
-    Improve error handling and connection management 
+    Add error handling and connection management 
 
     Refine the startup messages and user experience 
 
-**Simple UI Improvements (EINON): **
+** UI Improvements (EINON): **
 
-    Enhance the console UI or start with a basic graphical interface 
+    Enhance the console UI or start with a basic graphical interface to make it look more appealing,
+    
+    I will try my best to make it look more like a messaging app
 
     This will make testing and using the app more intuitive 
     
 
  ** Other Features (anyone of us): **  
 
-    Rich text, emojis, user status, and detailed profiles can be added last 
+    Rich text, emojis, user status, and detailed profiles can be added too to make a more robust app
 
-    These are nice-to-have features that build on the core functionality 
+    These features can be added by any of us if possible, but focus on the  main features above first
 
  
 
