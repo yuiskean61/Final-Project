@@ -1,6 +1,7 @@
 import socket
 import threading
 import time
+import sqlite3
 
 # server config
 HOST = '127.0.0.1'  # Localhost
@@ -12,6 +13,19 @@ usernames = {}
 
 # creates socket object
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+#Set up SQLite Database
+connection = sqlite3.connect('messages.db', check_same_thread=False)
+cursor = connection.cursor()
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        timestamp TEXT,
+        username TEXT,
+        message TEXT
+    )
+''')
+connection.commit()
 
 def start_server():
     # binds socket to a specific address and port
@@ -48,10 +62,12 @@ def handle_client(client):
                 if message.startswith("USERNAME:"):
                     username = message.split(":")[1]
                     usernames[client] = username
+                    #send_recent_messages(client)
                     broadcast(f"{username} has joined the chat!", client)
                     client.send("Connected to HumberChat server!".encode('ascii'))
                 else:
                     if client in usernames:
+                        save_message(usernames[client], message)
                         broadcast(f"{usernames[client]}: {message}", client)
                     else:
                         client.send("Please set your username first.".encode('ascii'))
@@ -79,6 +95,21 @@ def broadcast(message, sender_client):
                 clients.remove(client)
                 if client in usernames:
                     del usernames[client]
+
+def save_message(username, message):
+    timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+    cursor.execute('''
+        INSERT INTO messages (timestamp, username, message)
+        VALUES (?, ?, ?)
+    ''', (timestamp, username, message))
+    connection.commit()
+    print(f"Saved MEssage: [{timestamp}] {username}: {message}")
+
+def send_recent_messages(client):
+    cursor.execute('SELECT timestamp, username, message FROM messages ORDER BY id DESC LIMIT 20')
+    recent_msgs = cursor.fetchall()
+    for timestamp, username, message in reversed(recent_msgs):
+        client.send(f"[{timestamp}] {username}: {message}".encode('ascii'))
 
 if __name__ == "__main__":
     start_server()
