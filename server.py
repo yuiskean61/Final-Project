@@ -65,6 +65,8 @@ def handle_client(client):
                     #send_recent_messages(client)
                     broadcast(f"{username} has joined the chat!", client)
                     client.send("Connected to HumberChat server!".encode('ascii'))
+                elif message.lower() == 'history':
+                    send_recent_messages(client)
                 else:
                     if client in usernames:
                         save_message(usernames[client], message)

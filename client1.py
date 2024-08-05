@@ -60,6 +60,8 @@ def send_messages():
             client.close()
             break
         elif message.lower() == 'history':
+            client.send('history'.encode('ascii')) #Client sends history to receive message history
+            time.sleep(1) #Give the server time to get the messages
             print_messages()
         else:
             client.send(message.encode('ascii'))
