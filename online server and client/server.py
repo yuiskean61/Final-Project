@@ -3,12 +3,13 @@ import threading
 import time
 
 # server config
-HOST = '192.168.75.218'  # Server IP address
+HOST = '10.0.0.115'  # Server IP address
 PORT = 1024  # Choose any port number above 1024
 
 # stores connected clients and their usernames
 clients = []
 usernames = {}
+
 
 # creates socket object
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -39,7 +40,7 @@ def start_server():
 def handle_client(client):
     # adding clients to the list
     clients.append(client)
-    
+
     while True:
         try:
             # receives message from client
@@ -50,11 +51,27 @@ def handle_client(client):
                     usernames[client] = username
                     broadcast(f"{username} has joined the chat!", client)
                     client.send("Connected to HumberChat server!".encode('ascii'))
-                else:
-                    if client in usernames:
-                        broadcast(f"{usernames[client]}: {message}", client)
+                elif client in usernames:
+                    if message.startswith('/pm'):
+                        parts = message.split(" ", 2)
+                        if len(parts) < 3:
+                            client.send("Invalid private message format. Use /pm <username> <message>".encode('ascii'))
+                            continue
+                        receiver = parts[1]
+                        message_body = parts[2]
+                        timestamp = time.strftime("%H:%M:%S")
+                        if receiver in usernames.values():
+                            for receiver_client, username in usernames.items():
+                                if username == receiver:
+                                    receiver_client.send(f"PM from {usernames[client]}: {message_body}"
+                                                         .encode('ascii'))
+                                    client.send(f"PM to {username}: {message_body}".encode('ascii'))
+                        else:
+                            client.send(f"No user found with name {receiver}".encode('ascii'))
                     else:
-                        client.send("Please set your username first.".encode('ascii'))
+                        broadcast(f"{usernames[client]}: {message}", client)
+                else:
+                    client.send("Please set your username first.".encode('ascii'))
             else:
                 # Empty message, client disconnected
                 raise Exception("Client disconnected")

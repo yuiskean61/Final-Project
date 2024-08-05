@@ -3,9 +3,8 @@ import threading
 import time
 
 # client config
-HOST = '10.111.13.180'  # server IP address
-PORT = 1024         # The port used by the server
-
+HOST = '10.0.0.115'  # server IP address
+PORT = 1024
 # Create a socket object
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -15,7 +14,7 @@ def print_messages():
     print("\nChat History:")
     for msg in messages[-20:]:  # Show last 20 messages
         print(msg)
-    print("\nEnter your message: ", end="")
+    #print("\nEnter your message: ", end="")
 
 def connect():
     client.connect((HOST, PORT))
@@ -46,8 +45,8 @@ def receive_messages():
             timestamp = time.strftime("%H:%M:%S")
             formatted_message = f"[{timestamp}] {message}"
             messages.append(formatted_message)
-            print(f"\nNew message: {formatted_message}")
-            print("Enter your message: ", end="")
+            print(f"\n{formatted_message}")
+            # print("Enter your message: ", end="")
         except:
             print("An error occurred!")
             client.close()
@@ -55,14 +54,20 @@ def receive_messages():
 
 def send_messages():
     while True:
-        message = input("Enter your message: ")
-        if message.lower() == 'quit':
+        message = input("")
+        if message.lower() == '/quit':
             client.close()
             break
-        elif message.lower() == 'history':
+        elif message.lower() == '/history':
             print_messages()
-        else:
+        elif message.startswith('/pm'):
             client.send(message.encode('ascii'))
+        else:
+            timestamp = time.strftime("%H:%M:%S")
+            formatted_message = f"[{timestamp}] {username}: {message}"
+            messages.append(formatted_message)
+            client.send(message.encode('ascii'))
+
 
 
 if __name__ == "__main__":
