@@ -69,6 +69,7 @@ def handle_client(client):
             client.close()
             break
 
+
 def broadcast(message, sender_client):
     for client in clients:
         if client != sender_client:
