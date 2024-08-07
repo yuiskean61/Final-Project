@@ -136,6 +136,7 @@ def list_users_in_room(room_name):
             break
     return return_string
 
+
 def list_chat_rooms():
     return_string = ""
     for room in chat_rooms:
