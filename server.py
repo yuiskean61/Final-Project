@@ -6,7 +6,7 @@ import user
 
 # server config
 HOST = '10.0.0.115'  # Server IP address
-PORT = 1025  # Choose any port number above 1024
+PORT = 1024  # Choose any port number above 1024
 
 # stores connected clients and their usernames
 clients = []

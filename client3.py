@@ -4,7 +4,7 @@ import time
 
 # client config
 HOST = '10.0.0.115'  # server IP address
-PORT = 1025
+PORT = 1024
 # Create a socket object
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
