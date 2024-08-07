@@ -4,7 +4,7 @@ import time
 
 # client config
 HOST = '10.0.0.115'  # server IP address
-PORT = 1024
+PORT = 1025
 # Create a socket object
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -25,6 +25,7 @@ def connect():
     =====================
     Connected to server at {HOST}:{PORT}
     You are logged in as: {username}
+    Connecting to chatroom: general
 
     Instructions:
     - Type your message and press Enter to send
