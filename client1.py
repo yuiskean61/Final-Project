@@ -24,17 +24,14 @@ def connect():
     Welcome to HumberChat
     =====================
     Connected to server at {HOST}:{PORT}
-    You are logged in as: {username}
-    Connecting to chatroom: general
 
     Instructions:
+    - Type 'register:<username>:<password>' to register an account
+    - Type 'login:<username>:<password>' to log in
     - Type your message and press Enter to send
-    - Type 'history' to view recent messages
-    - Type 'quit' to exit the chat
+    - Type '/history' to view recent messages
+    - Type '/quit' to exit the chat
     """)
-
-    # Send username to server
-    client.send(f"USERNAME:{username}".encode('ascii'))
 
     receive_thread = threading.Thread(target=receive_messages)
     receive_thread.start()
@@ -64,17 +61,13 @@ def send_messages():
             client.close()
             break
         elif message.lower() == '/history':
-            print_messages()
+            client.send('/history'.encode('ascii'))  # Client sends history to receive message history
+            time.sleep(1)  # Give the server time to get the messages
         elif message.startswith('/pm'):
             client.send(message.encode('ascii'))
         else:
-            timestamp = time.strftime("%H:%M:%S")
-            formatted_message = f"[{timestamp}] {username}: {message}"
-            messages.append(formatted_message)
             client.send(message.encode('ascii'))
 
 
-
 if __name__ == "__main__":
-    username = input("Enter your username: ")
     connect()
