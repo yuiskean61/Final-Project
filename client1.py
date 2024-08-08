@@ -3,19 +3,20 @@ import threading
 import time
 
 # client config
-HOST = '127.0.0.1'  # The server's hostname or IP address
-PORT = 1024         # The port used by the server
-
+HOST = '10.0.0.115'  # server IP address
+PORT = 1024
 # Create a socket object
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 messages = []
 
+
 def print_messages():
     print("\nChat History:")
     for msg in messages[-20:]:  # Show last 20 messages
         print(msg)
-    print("\nEnter your message: ", end="")
+    # print("\nEnter your message: ", end="")
+
 
 def connect():
     client.connect((HOST, PORT))
@@ -23,21 +24,20 @@ def connect():
     Welcome to HumberChat
     =====================
     Connected to server at {HOST}:{PORT}
-    You are logged in as: {username}
 
     Instructions:
+    - Type 'register:<username>:<password>' to register an account
+    - Type 'login:<username>:<password>' to log in
     - Type your message and press Enter to send
-    - Type 'history' to view recent messages
-    - Type 'quit' to exit the chat
+    - Type '/history' to view recent messages
+    - Type '/quit' to exit the chat
     """)
-    
-    # Send username to server
-    client.send(f"USERNAME:{username}".encode('ascii'))
-    
+
     receive_thread = threading.Thread(target=receive_messages)
     receive_thread.start()
-    
+
     send_messages()
+
 
 def receive_messages():
     while True:
@@ -46,24 +46,28 @@ def receive_messages():
             timestamp = time.strftime("%H:%M:%S")
             formatted_message = f"[{timestamp}] {message}"
             messages.append(formatted_message)
-            print(f"\nNew message: {formatted_message}")
-            print("Enter your message: ", end="")
+            print(f"\n{formatted_message}")
+            # print("Enter your message: ", end="")
         except:
             print("An error occurred!")
             client.close()
             break
 
+
 def send_messages():
     while True:
-        message = input("Enter your message: ")
-        if message.lower() == 'quit':
+        message = input("")
+        if message.lower() == '/quit':
             client.close()
             break
-        elif message.lower() == 'history':
-            print_messages()
+        elif message.lower() == '/history':
+            client.send('/history'.encode('ascii'))  # Client sends history to receive message history
+            time.sleep(1)  # Give the server time to get the messages
+        elif message.startswith('/pm'):
+            client.send(message.encode('ascii'))
         else:
             client.send(message.encode('ascii'))
 
+
 if __name__ == "__main__":
-    username = input("Enter your username: ")
     connect()
