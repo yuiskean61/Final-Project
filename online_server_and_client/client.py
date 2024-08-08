@@ -3,6 +3,7 @@ import threading
 import time
 
 # client config
+local_host = '127.0.0.1'
 HOST = '10.111.13.180'  # server IP address
 PORT = 1024         # The port used by the server
 
@@ -18,21 +19,21 @@ def print_messages():
     print("\nEnter your message: ", end="")
 
 def connect():
-    client.connect((HOST, PORT))
+    client.connect((local_host, PORT))#changed to local host for testing
     print(f"""
     Welcome to HumberChat
     =====================
     Connected to server at {HOST}:{PORT}
-    You are logged in as: {username}
 
     Instructions:
+    - Type 'register:<username>:<password>' to register an account
+    - Type 'login:<username>:<password>' to log in
     - Type your message and press Enter to send
     - Type 'history' to view recent messages
     - Type 'quit' to exit the chat
     """)
     
     # Send username to server
-    client.send(f"USERNAME:{username}".encode('ascii'))
     
     receive_thread = threading.Thread(target=receive_messages)
     receive_thread.start()
@@ -60,10 +61,11 @@ def send_messages():
             client.close()
             break
         elif message.lower() == 'history':
+            client.send('history'.encode('ascii')) #Client sends history to receive message history
+            time.sleep(1) #Give the server time to get the messages
             print_messages()
         else:
             client.send(message.encode('ascii'))
 
 if __name__ == "__main__":
-    username = input("Enter your username: ")
     connect()
