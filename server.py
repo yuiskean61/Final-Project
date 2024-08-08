@@ -25,6 +25,13 @@ cursor.execute('''
         message TEXT
     )
 ''')
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        password TEXT
+    )
+''')
 connection.commit()
 
 def start_server():
@@ -59,7 +66,15 @@ def handle_client(client):
             # receives message from client
             message = client.recv(1024).decode('ascii')
             if message:
-                if message.startswith("USERNAME:"):
+                if message.startswith("REGISTER:"):
+                    print("here")
+                    _, username, password = message.split(":")
+                    register(client, username, password)
+                    print("here 2")
+                elif message.startswith("LOGIN:"):
+                    _, username, password = message.split(":")
+                    login(client, username, password)
+                elif message.startswith("USERNAME:"):
                     username = message.split(":")[1]
                     usernames[client] = username
                     #send_recent_messages(client)
@@ -72,7 +87,7 @@ def handle_client(client):
                         save_message(usernames[client], message)
                         broadcast(f"{usernames[client]}: {message}", client)
                     else:
-                        client.send("Please set your username first.".encode('ascii'))
+                        client.send("Please log in first.".encode('ascii'))
             else:
                 # Empty message, client disconnected
                 raise Exception("Client disconnected")
@@ -112,6 +127,30 @@ def send_recent_messages(client):
     recent_msgs = cursor.fetchall()
     for timestamp, username, message in reversed(recent_msgs):
         client.send(f"[{timestamp}] {username}: {message}".encode('ascii'))
+
+#Register Function
+def register(client, username, password):
+    try:
+        cursor.execute('''
+            INSERT INTO users (username, password)
+            VALUES (?, ?)
+        ''', (username, password))
+        connection.commit()
+        client.send(f"Registration successful. You can now login as {username}!".encode('ascii'))
+    except sqlite3.IntegrityError:
+        client.send("Username already exists. Please try a different username".encode('ascii'))
+
+#Login function
+def login(client, username, password):
+    cursor.execute('''
+        SELECT * FROM users WHERE username = ? AND password = ?
+    ''', (username, password))
+    user = cursor.fetchone()
+    if user:
+        usernames[client] = username
+        client.send(f"Login successful. Welcome {username}!".encode('ascii'))
+    else:
+        client.send("Invalid username or password. Please try again.")
 
 if __name__ == "__main__":
     start_server()

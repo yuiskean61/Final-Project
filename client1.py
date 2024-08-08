@@ -23,16 +23,18 @@ def connect():
     Welcome to HumberChat
     =====================
     Connected to server at {HOST}:{PORT}
-    You are logged in as: {username}
+    
 
     Instructions:
+    - Type 'register:<username>:<password>' to register an account
+    - Type 'login:<username>:<password>' to log in
     - Type your message and press Enter to send
     - Type 'history' to view recent messages
     - Type 'quit' to exit the chat
     """)
     
     # Send username to server
-    client.send(f"USERNAME:{username}".encode('ascii'))
+    #client.send(f"USERNAME:{username}".encode('ascii'))
     
     receive_thread = threading.Thread(target=receive_messages)
     receive_thread.start()
@@ -67,5 +69,5 @@ def send_messages():
             client.send(message.encode('ascii'))
 
 if __name__ == "__main__":
-    username = input("Enter your username: ")
+    #username = input("Enter your username: ")
     connect()
