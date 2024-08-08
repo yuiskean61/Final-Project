@@ -10,11 +10,13 @@ client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 messages = []
 
+
 def print_messages():
     print("\nChat History:")
     for msg in messages[-20:]:  # Show last 20 messages
         print(msg)
-    #print("\nEnter your message: ", end="")
+    # print("\nEnter your message: ", end="")
+
 
 def connect():
     client.connect((HOST, PORT))
@@ -23,20 +25,22 @@ def connect():
     =====================
     Connected to server at {HOST}:{PORT}
     You are logged in as: {username}
+    Connecting to chatroom: general
 
     Instructions:
     - Type your message and press Enter to send
     - Type 'history' to view recent messages
     - Type 'quit' to exit the chat
     """)
-    
+
     # Send username to server
     client.send(f"USERNAME:{username}".encode('ascii'))
-    
+
     receive_thread = threading.Thread(target=receive_messages)
     receive_thread.start()
-    
+
     send_messages()
+
 
 def receive_messages():
     while True:
@@ -51,6 +55,7 @@ def receive_messages():
             print("An error occurred!")
             client.close()
             break
+
 
 def send_messages():
     while True:
