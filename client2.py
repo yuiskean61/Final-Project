@@ -56,6 +56,7 @@ def help_message():
         - '/room <room name>' - switches chat room to matching name
         - '/rlist' - gets a list of chat rooms
         - '/ulist' - gets a list of users in a your chat room
+        - '/listall' - get a list of ALL online users
         - '/myroom' - gets the name of your current chatroom
         - '/quit' - exit the chat
         """)
@@ -65,22 +66,25 @@ def receive_messages():
     while True:
         try:
             message = client.recv(1024).decode('ascii')
+            if not message:  # Check for socket closure
+                print("Connection to server ended. Closing client.")
+                break
             timestamp = time.strftime("%H:%M:%S")
             formatted_message = f"[{timestamp}] {message}"
             messages.append(formatted_message)
             print(f"\n{formatted_message}")
             # print("Enter your message: ", end="")
         except:
-            print("Connection to server ended. Closing client.")
-            client.close()
+            print("Connection to server ended.")
             break
+    client.close()
 
 
 def send_messages():
     while True:
         message = input("")
         if message.lower() == '/quit':
-            client.send('/quit'.encode('ascii'))
+            print(f"Closing connection to the server.")
             client.close()
             break
         elif message.lower() == '/help':
