@@ -5,7 +5,7 @@ import time
 import chatroom
 
 # server config
-HOST = '10.0.0.115'  # Server IP address
+HOST = '127.0.0.1'  # Server IP address
 PORT = 1024  # Choose any port number above 1024
 
 # stores connected clients and their usernames
