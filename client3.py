@@ -24,22 +24,41 @@ def connect():
     Welcome to HumberChat
     =====================
     Connected to server at {HOST}:{PORT}
-    You are logged in as: {username}
-    Connecting to chatroom: general
 
     Instructions:
+    - Type 'register:<username>:<password>' to register an account
+    - Type 'login:<username>:<password>' to log in
     - Type your message and press Enter to send
-    - Type 'history' to view recent messages
-    - Type 'quit' to exit the chat
+    - Type '/help' to view more commands and info
     """)
-
-    # Send username to server
-    client.send(f"USERNAME:{username}".encode('ascii'))
 
     receive_thread = threading.Thread(target=receive_messages)
     receive_thread.start()
 
     send_messages()
+
+
+def help_message():
+    print(f"""
+        Information
+        ========================================
+        Connected to server at {HOST}:{PORT}
+        - Type your message and press Enter to send
+        - Type 'register:<username>:<password>' to register an account
+        - Type 'login:<username>:<password>' to log in
+        - Type '/' followed by a command word to use a command
+
+        Command List
+        =========================================
+        - '/pm <user name> <message>' - sends a private message to 
+                                        user with given user name
+        - '/history' - view recent messages
+        - '/room <room name>' - switches chat room to matching name
+        - '/rlist' - gets a list of chat rooms
+        - '/ulist' - gets a list of users in a your chat room
+        - '/myroom' - gets the name of your current chatroom
+        - '/quit' - exit the chat
+        """)
 
 
 def receive_messages():
@@ -52,7 +71,7 @@ def receive_messages():
             print(f"\n{formatted_message}")
             # print("Enter your message: ", end="")
         except:
-            print("An error occurred!")
+            print("Connection to server ended. Closing client.")
             client.close()
             break
 
@@ -61,20 +80,19 @@ def send_messages():
     while True:
         message = input("")
         if message.lower() == '/quit':
+            client.send('/quit'.encode('ascii'))
             client.close()
             break
+        elif message.lower() == '/help':
+            help_message()
         elif message.lower() == '/history':
-            print_messages()
+            client.send('/history'.encode('ascii'))  # Client sends history to receive message history
+            time.sleep(1)  # Give the server time to get the messages
         elif message.startswith('/pm'):
             client.send(message.encode('ascii'))
         else:
-            timestamp = time.strftime("%H:%M:%S")
-            formatted_message = f"[{timestamp}] {username}: {message}"
-            messages.append(formatted_message)
             client.send(message.encode('ascii'))
 
 
-
 if __name__ == "__main__":
-    username = input("Enter your username: ")
     connect()
