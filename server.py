@@ -90,22 +90,6 @@ def handle_client(client):
                     # handle chat history command
                     elif message.lower() == '/history':
                         send_recent_messages(client)
-                    # handle chat quit command, make sure user is signed out
-                    elif message.lower() == '/quit':
-                        print('You are quitting.')
-                        #client.send("Signing out and closing...".encode('ascii'))
-                        if client in client_to_room:
-                            print('Removing from room.')
-                            del client_to_room[client]
-                        if client in usernames:
-                            print('Removing from users.')
-                            del usernames[client]
-                        if client in clients:
-                            print("Removing from clients")
-                            clients.remove(client)
-                        print('Closing Client.')
-                        #client.close()
-                        #break
                     # Commands with access granted only to logged-in users
                     elif client in usernames:
                         # Private messaging command
@@ -171,6 +155,7 @@ def handle_client(client):
                     raise Exception("Client disconnected")
             except Exception:
                 break
+    # Handle client quitting
     finally:
         if client in client_to_room:
             broadcast(f'{usernames[client]} left the chat!', client, get_client_room_name(client))
