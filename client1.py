@@ -66,8 +66,10 @@ def receive_messages():
     while True:
         try:
             message = client.recv(1024).decode('ascii')
+            print(f"raw msg {message}")
             if not message:  # Check for socket closure
                 print("Connection to server ended. Closing client.")
+                print("Here")
                 break
             timestamp = time.strftime("%H:%M:%S")
             formatted_message = f"[{timestamp}] {message}"
@@ -82,20 +84,26 @@ def receive_messages():
 
 def send_messages():
     while True:
-        message = input("")
-        if message.lower() == '/quit':
-            print(f"Closing connection to the server.")
+        try:
+            message = input("")
+            if message.lower() == '/quit':
+                print(f"Closing connection to the server.")
+                client.close()
+                break
+            elif message.lower() == '/help':
+                help_message()
+            elif message.lower() == '/history':
+                client.send('/history'.encode('ascii'))  # Client sends history to receive message history
+                time.sleep(1)  # Give the server time to get the messages
+            elif message.startswith('/pm'):
+                client.send(message.encode('ascii'))
+            else:
+                client.send(message.encode('ascii'))
+                print("Client send a message")
+        except Exception as e:
+            print(f"An error occurred: {e}")
             client.close()
             break
-        elif message.lower() == '/help':
-            help_message()
-        elif message.lower() == '/history':
-            client.send('/history'.encode('ascii'))  # Client sends history to receive message history
-            time.sleep(1)  # Give the server time to get the messages
-        elif message.startswith('/pm'):
-            client.send(message.encode('ascii'))
-        else:
-            client.send(message.encode('ascii'))
 
 
 if __name__ == "__main__":

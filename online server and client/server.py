@@ -27,7 +27,8 @@ cursor.execute('''
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         timestamp TEXT,
         username TEXT,
-        message TEXT
+        message TEXT,
+        chatroom TEXT
     )
 ''')
 cursor.execute('''
@@ -146,7 +147,7 @@ def handle_client(client):
                             client.send(f"You are in chat room: {get_client_room_name(client)}".encode('ascii'))
                         # If user is logged in and the message was not a command; display message to the chat room
                         else:
-                            save_message(usernames[client], message)
+                            save_message(usernames[client], message, client_to_room[client].name)
                             broadcast(f"{usernames[client]}: {message}",
                                       client, client_to_room[client].name)
                     else:
@@ -270,14 +271,14 @@ def broadcast(message, sender_client, room_name):
 
 
 # Saves message to the DB
-def save_message(username, message):
+def save_message(username, message, chatroom):
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
     cursor.execute('''
-        INSERT INTO messages (timestamp, username, message)
-        VALUES (?, ?, ?)
-    ''', (timestamp, username, message))
+        INSERT INTO messages (timestamp, username, message, chatroom)
+        VALUES (?, ?, ?, ?)
+    ''', (timestamp, username, message, chatroom))
     connection.commit()
-    print(f"Saved Message: [{timestamp}] {username}: {message}")
+    print(f"Saved Message: [{timestamp}] {username} in {chatroom}: {message}")
 
 
 # Fetches recent messages from the DB and sends to client

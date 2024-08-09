@@ -27,7 +27,8 @@ cursor.execute('''
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         timestamp TEXT,
         username TEXT,
-        message TEXT
+        message TEXT,
+        chatroom TEXT
     )
 ''')
 cursor.execute('''
@@ -76,6 +77,7 @@ def handle_client(client):
             try:
                 # receives message from client
                 message = client.recv(1024).decode('ascii')
+                print(f"raw msg {message}")
                 if message:
                     # handle user registration command
                     if message.startswith("register:"):
@@ -146,14 +148,15 @@ def handle_client(client):
                             client.send(f"You are in chat room: {get_client_room_name(client)}".encode('ascii'))
                         # If user is logged in and the message was not a command; display message to the chat room
                         else:
-                            save_message(usernames[client], message)
+                            save_message(usernames[client], message, client_to_room[client].name)
                             broadcast(f"{usernames[client]}: {message}",
                                       client, client_to_room[client].name)
                     else:
                         client.send("Please log in or register first.".encode('ascii'))
                 else:
                     raise Exception("Client disconnected")
-            except Exception:
+            except Exception as e:
+                print(f"error {e}")
                 break
     # Handle client quitting
     finally:
@@ -261,8 +264,9 @@ def broadcast(message, sender_client, room_name):
                 if client != sender_client and client in usernames:
                     try:
                         client.send(f"{message}".encode('ascii'))
-                    except:
+                    except Exception as e:
                         # if sending fails, assume client disconnected
+                        print(f"error {e}")
                         if client in clients:
                             clients.remove(client)
                         if client in usernames:
@@ -270,14 +274,14 @@ def broadcast(message, sender_client, room_name):
 
 
 # Saves message to the DB
-def save_message(username, message):
+def save_message(username, message, chatroom):
     timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
     cursor.execute('''
-        INSERT INTO messages (timestamp, username, message)
-        VALUES (?, ?, ?)
-    ''', (timestamp, username, message))
+        INSERT INTO messages (timestamp, username, message, chatroom)
+        VALUES (?, ?, ?, ?)
+    ''', (timestamp, username, message, chatroom))
     connection.commit()
-    print(f"Saved Message: [{timestamp}] {username}: {message}")
+    print(f"Saved Message: [{timestamp}] {username} in {chatroom}: {message}")
 
 
 # Fetches recent messages from the DB and sends to client
