@@ -74,7 +74,7 @@ def send_messages():
             client.send(message.encode('ascii'))
 
 
-
 if __name__ == "__main__":
     username = input("Enter your username: ")
     connect()
+

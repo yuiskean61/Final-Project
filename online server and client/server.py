@@ -51,10 +51,7 @@ def start_server():
     Server started on: {HOST}:{PORT}
     Date: {time.strftime('%Y-%m-%d')}
     Time: {time.strftime('%H:%M:%S')}
-
-    """)
-    print(f"""
-    Creating chat rooms...
+    Creating chat rooms... 
     """)
     init_chat_rooms()
     print(f"""
@@ -263,6 +260,7 @@ def register(client, username, password):
             INSERT INTO users (username, password)
             VALUES (?, ?)
         ''', (username, password))
+        print(f'Registration of user: {username}')
         connection.commit()
         client.send(f"Registration successful. You can now login as {username}!".encode('ascii'))
         return True
@@ -288,7 +286,8 @@ def login(client, username, password):
         broadcast(f"{username} has joined the chat!", client, get_client_room_name(client))
         client.send(f"Connected to chatroom: {get_client_room_name(client)}".encode('ascii'))
     else:
-        client.send("Invalid username or password. Please try again.")
+        print('here')
+        client.send("Invalid username or password. Please try again.".encode('ascii'))
 
 
 if __name__ == "__main__":
