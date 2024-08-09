@@ -94,35 +94,58 @@ def handle_client(client):
                     client.send("Signing out and closing...".encode('ascii'))
                     client.close()
                     break
+                # Commands with access granted only to logged-in users
                 elif client in usernames:
+                    # Private messaging command
                     if message.startswith('/pm'):
+                        # Gets the target users name and the message by splitting original command string
                         parts = message.split(" ", 2)
+                        # Handle invalid format
                         if len(parts) < 3:
                             client.send("Invalid private message format. Use /pm <username> <message>".encode('ascii'))
                             continue
+                        # Set receiver and message to corresponding part
                         receiver = parts[1]
                         message_body = parts[2]
+                        # If the receiver is signed in to server
                         if receiver in usernames.values():
+                            '''
+                            Used to search for the receiver client, since client is the key, some form of iteration
+                            is required when only the name is given. A 'next' function could lower the line count,
+                            but I found it was harder to make and maintain, and has the same time cost as a for loop.
+                            '''
                             for receiver_client, username in usernames.items():
                                 if username == receiver:
+                                    # Send message to receiver
                                     receiver_client.send(f"PM from {usernames[client]}: {message_body}"
                                                          .encode('ascii'))
+                                    # Display copy of message to sender
                                     client.send(f"PM to {username}: {message_body}".encode('ascii'))
+                                    break  # break early once a user with matching name is found
+                        # Handle if no user is found
                         else:
                             client.send(f"No user found with name {receiver}".encode('ascii'))
+                    # Command to switch users current chatroom
                     elif message.startswith('/room'):
                         parts = message.split(" ", 2)
+                        # Handle invalid format
                         if len(parts) < 2:
                             client.send("Invalid command format. Use /room <room name>".encode('ascii'))
                             continue
+                        # Get name of the room the user wishes to switch to
                         target_room = parts[1]
+                        # switch their room
                         change_client_room(client, target_room)
+                    # The command used to list all rooms
                     elif message.startswith('/rlist'):
                         client.send(list_chat_rooms().encode('ascii'))
+                    # The command used to list all users in user's current room
                     elif message.startswith('/ulist'):
                         client.send(list_users_in_room(get_client_room_name(client)).encode('ascii'))
+                    # The command used to display users current room
                     elif message.startswith('/myroom'):
                         client.send(f"You are in chat room: {get_client_room_name(client)}".encode('ascii'))
+                    # If user is logged in and the message was not a command; display message to the chat room
                     else:
                         save_message(usernames[client], message)
                         broadcast(f"{usernames[client]}: {message}",
@@ -166,13 +189,17 @@ def add_user_to_room(client, room_name):
 # Lists all users in the clients current chat room
 def list_users_in_room(room_name):
     return_string = f""
+    '''
+    As only a name is given, and no key value for the chatroom object in the dictionary,
+    iteration is used to find the required room
+    '''
     for room in chat_rooms:
         if room.name == room_name:
             return_string += f"Users in {room.name}: \n"
             for client in room.clients:
                 if client in usernames:
                     return_string += usernames[client] + "\n"  # Append username to return_string
-            break
+            break # Exit early once desired room is found
     return return_string
 
 
@@ -184,7 +211,7 @@ def list_chat_rooms():
     return return_string
 
 
-# Gets the name of the chat room the client is currently in
+# Gets the name of the chat room the client is currently in, or none if they are not in a room
 def get_client_room_name(client):
     if client in client_to_room:
         return client_to_room[client].name
