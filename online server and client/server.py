@@ -286,7 +286,6 @@ def login(client, username, password):
         broadcast(f"{username} has joined the chat!", client, get_client_room_name(client))
         client.send(f"Connected to chatroom: {get_client_room_name(client)}".encode('ascii'))
     else:
-        print('here')
         client.send("Invalid username or password. Please try again.".encode('ascii'))
 
 

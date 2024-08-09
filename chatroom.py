@@ -1,6 +1,6 @@
 class ChatRoom:
-    name = ""
-    clients = []
+    name = ""  # the name of the room
+    clients = []  # clients in the room
 
     def __init__(self, name):
         self.name = name
